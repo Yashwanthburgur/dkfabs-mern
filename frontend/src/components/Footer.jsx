@@ -1,5 +1,6 @@
 // src/components/Footer.jsx - USE THIS VERSION (no Tailwind)
-import React from 'react';
+import React from "react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -13,20 +14,39 @@ const Footer = () => {
           </div>
           <div className="footer-right">
             <div className="footer-links">
-              <a href="#home">Home</a>
-              <a href="#services">Services</a>
-              <a href="#about">About</a>
-              <a href="#contact">Contact</a>
+              <Link to="/#home">Home</Link>
+              <Link to="/#services">Services</Link>
+              <Link to="/#about">About</Link>
+              <Link to="/#contact">Contact</Link>
             </div>
             <div className="footer-social">
-              <a href="#" className="social-link"><i className="fab fa-linkedin"></i> LinkedIn</a>
-              <a href="mailto:info@dkfabs.com" className="social-link"><i className="fas fa-envelope"></i> Email</a>
-              <a href="https://wa.me/919876543210" className="social-link"><i className="fab fa-whatsapp"></i> WhatsApp</a>
+              <a
+                href="https://www.linkedin.com/"
+                target="_blank"
+                rel="noreferrer"
+                className="social-link"
+              >
+                <i className="fab fa-linkedin"></i> LinkedIn
+              </a>
+              <a href="mailto:dkfabs@gmail.com" className="social-link">
+                <i className="fas fa-envelope"></i> Email
+              </a>
+              <a
+                href="https://wa.me/919740443999"
+                target="_blank"
+                rel="noreferrer"
+                className="social-link"
+              >
+                <i className="fab fa-whatsapp"></i> WhatsApp
+              </a>
             </div>
           </div>
         </div>
         <div className="footer-bottom">
-          <p>&copy; 2025 D.K. Fabs. All rights reserved. | Crafted with precision for precision craftsmen</p>
+          <p>
+            &copy; 2025 D.K. Fabs. All rights reserved. | Crafted with precision
+            for precision craftsmen
+          </p>
         </div>
       </div>
     </footer>

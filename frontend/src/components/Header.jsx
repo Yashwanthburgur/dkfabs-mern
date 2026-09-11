@@ -1,23 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const goToSection = (targetId) => {
+    setIsMenuOpen(false);
+    if (location.pathname !== "/") {
+      navigate(`/#${targetId}`);
+      return;
+    }
+
+    document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const scrollToContact = () => {
-    const contactSection = document.getElementById('contact');
-    contactSection?.scrollIntoView({ behavior: 'smooth' });
-    setIsMenuOpen(false);
+    goToSection("contact");
   };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-  };   
+  };
 
   const handleNavClick = (e, targetId) => {
     e.preventDefault();
-    const targetSection = document.getElementById(targetId);
-    targetSection?.scrollIntoView({ behavior: 'smooth' });
-    setIsMenuOpen(false);
+    goToSection(targetId);
   };
 
   return (
@@ -26,15 +35,41 @@ const Header = () => {
         <div className="nav-brand">
           <img src="/DKF_logo.png" alt="D.K. Fabs" className="logo-img" />
         </div>
-        <ul className={`nav-links ${isMenuOpen ? 'active' : ''}`} id="navLinks">
-          <li><a href="#home" onClick={(e) => handleNavClick(e, 'home')}>Home</a></li>
-          <li><a href="#about" onClick={(e) => handleNavClick(e, 'about')}>About</a></li>
-          <li><a href="#services" onClick={(e) => handleNavClick(e, 'services')}>Services</a></li>
-          <li><a href="#projects" onClick={(e) => handleNavClick(e, 'projects')}>Projects</a></li>
-          <li><a href="#contact" onClick={(e) => handleNavClick(e, 'contact')}>Contact</a></li>
+        <ul className={`nav-links ${isMenuOpen ? "active" : ""}`} id="navLinks">
+          <li>
+            <a href="#home" onClick={(e) => handleNavClick(e, "home")}>
+              Home
+            </a>
+          </li>
+          <li>
+            <a href="#about" onClick={(e) => handleNavClick(e, "about")}>
+              About
+            </a>
+          </li>
+          <li>
+            <a href="#services" onClick={(e) => handleNavClick(e, "services")}>
+              Services
+            </a>
+          </li>
+          <li>
+            <a href="#projects" onClick={(e) => handleNavClick(e, "projects")}>
+              Projects
+            </a>
+          </li>
+          <li>
+            <a href="#contact" onClick={(e) => handleNavClick(e, "contact")}>
+              Contact
+            </a>
+          </li>
         </ul>
-        <button className="cta-btn" onClick={scrollToContact}>Request a Quote</button>
-        <div className={`hamburger ${isMenuOpen ? 'active' : ''}`} id="hamburger" onClick={toggleMenu}>
+        <button className="cta-btn" onClick={scrollToContact}>
+          Request a Quote
+        </button>
+        <div
+          className={`hamburger ${isMenuOpen ? "active" : ""}`}
+          id="hamburger"
+          onClick={toggleMenu}
+        >
           <span></span>
           <span></span>
           <span></span>

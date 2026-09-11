@@ -1,79 +1,101 @@
-import React, { useState, useEffect, useRef } from 'react';  // ← CHANGE 1: Added useRef
+import React, { useState, useRef } from "react";
 
 const QuoteForm = () => {
   const [files, setFiles] = useState([]);
   const [showOptional, setShowOptional] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [status, setStatus] = useState({ type: '', message: '' });
-  const fileInputRef = useRef(null);  // ← CHANGE 2: Added ref
+  const [status, setStatus] = useState({ type: "", message: "" });
+  const fileInputRef = useRef(null); // ← CHANGE 2: Added ref
 
   // File validation constants
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-  const ALLOWED_EXTENSIONS = ['.pdf', '.png', '.jpg', '.jpeg', '.dwg', '.step', '.stp', '.iges', '.igs', '.stl', '.dxf'];
+  const ALLOWED_EXTENSIONS = [
+    ".pdf",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".dwg",
+    ".step",
+    ".stp",
+    ".iges",
+    ".igs",
+    ".stl",
+    ".dxf",
+  ];
 
-  const handleFileChange = (e) => {  // ← CHANGE 3: Replaced entire function
+  const handleFileChange = (e) => {
+    // ← CHANGE 3: Replaced entire function
     const selectedFiles = Array.from(e.target.files);
     const validFiles = [];
-    
-    selectedFiles.forEach(file => {
+
+    selectedFiles.forEach((file) => {
       if (validateFile(file)) {
         validFiles.push(file);
       }
     });
-    
+
     // Update React state
-    setFiles(prev => [...prev, ...validFiles]);
-    
+    setFiles((prev) => [...prev, ...validFiles]);
+
     // Sync with input so FormData sees the files
     const dataTransfer = new DataTransfer();
-    
+
     // Keep existing files
     if (fileInputRef.current && fileInputRef.current.files.length > 0) {
-      Array.from(fileInputRef.current.files).forEach(f => dataTransfer.items.add(f));
+      Array.from(fileInputRef.current.files).forEach((f) =>
+        dataTransfer.items.add(f),
+      );
     }
-    
+
     // Add new files
-    validFiles.forEach(file => dataTransfer.items.add(file));
-    
+    validFiles.forEach((file) => dataTransfer.items.add(file));
+
     // Assign back to input
     if (fileInputRef.current) {
       fileInputRef.current.files = dataTransfer.files;
     }
-    
+
     // Allow re-selecting same files
-    e.target.value = '';
+    e.target.value = "";
   };
 
   const validateFile = (file) => {
     // Check file size
     if (file.size > MAX_FILE_SIZE) {
-      showFormStatus(`File "${file.name}" is too large. Maximum size is 10MB.`, 'error');
+      showFormStatus(
+        `File "${file.name}" is too large. Maximum size is 10MB.`,
+        "error",
+      );
       return false;
     }
-    
+
     // Check file extension
-    const fileExtension = '.' + file.name.toLowerCase().split('.').pop();
+    const fileExtension = "." + file.name.toLowerCase().split(".").pop();
     if (!ALLOWED_EXTENSIONS.includes(fileExtension)) {
-      showFormStatus(`File "${file.name}" has an unsupported format. Allowed formats: PDF, PNG, JPG, DWG, STEP, IGES, STL, DXF`, 'error');
+      showFormStatus(
+        `File "${file.name}" has an unsupported format. Allowed formats: PDF, PNG, JPG, DWG, STEP, IGES, STL, DXF`,
+        "error",
+      );
       return false;
     }
-    
+
     // Check for duplicate files
-    if (files.some(f => f.name === file.name && f.size === file.size)) {
-      showFormStatus(`File "${file.name}" has already been added.`, 'error');
+    if (files.some((f) => f.name === file.name && f.size === file.size)) {
+      showFormStatus(`File "${file.name}" has already been added.`, "error");
       return false;
     }
-    
+
     return true;
   };
 
-  const removeFile = (index) => {  // ← CHANGE 4: Replaced entire function
+  const removeFile = (index) => {
+    // ← CHANGE 4: Replaced entire function
     const newFiles = files.filter((_, i) => i !== index);
     setFiles(newFiles);
 
     // Sync input
     const dataTransfer = new DataTransfer();
-    newFiles.forEach(file => dataTransfer.items.add(file));
+    newFiles.forEach((file) => dataTransfer.items.add(file));
     if (fileInputRef.current) {
       fileInputRef.current.files = dataTransfer.files;
     }
@@ -84,76 +106,103 @@ const QuoteForm = () => {
   };
 
   const getFileIcon = (fileName) => {
-    const extension = fileName.toLowerCase().split('.').pop();
+    const extension = fileName.toLowerCase().split(".").pop();
     const iconMap = {
-      'pdf': 'fas fa-file-pdf',
-      'png': 'fas fa-file-image',
-      'jpg': 'fas fa-file-image',
-      'jpeg': 'fas fa-file-image',
-      'dwg': 'fas fa-drafting-compass',
-      'step': 'fas fa-cube',
-      'stp': 'fas fa-cube',
-      'iges': 'fas fa-cube',
-      'igs': 'fas fa-cube',
-      'stl': 'fas fa-cube',
-      'dxf': 'fas fa-drafting-compass'
+      pdf: "fas fa-file-pdf",
+      png: "fas fa-file-image",
+      jpg: "fas fa-file-image",
+      jpeg: "fas fa-file-image",
+      dwg: "fas fa-drafting-compass",
+      step: "fas fa-cube",
+      stp: "fas fa-cube",
+      iges: "fas fa-cube",
+      igs: "fas fa-cube",
+      stl: "fas fa-cube",
+      dxf: "fas fa-drafting-compass",
     };
-    return iconMap[extension] || 'fas fa-file';
+    return iconMap[extension] || "fas fa-file";
   };
 
   const formatFileSize = (bytes) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   const showFormStatus = (message, type) => {
     setStatus({ type, message });
     setTimeout(() => {
-      setStatus({ type: '', message: '' });
+      setStatus({ type: "", message: "" });
     }, 5000);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setStatus({ type: 'loading', message: 'Sending your request...' });
+    setStatus({ type: "loading", message: "Sending your request..." });
 
     const formData = new FormData(e.target);
-    console.log('📤 Files in FormData:', formData.getAll('files').length); // ← Debug log
+    const fields = Object.fromEntries(formData.entries());
+    const message = [
+      `Quote request from ${fields.name}`,
+      `Email: ${fields.email}`,
+      `Phone: ${fields.phone}`,
+      fields.company && `Company: ${fields.company}`,
+      `Description: ${fields.description}`,
+      fields.service && `Service: ${fields.service}`,
+      fields.quantity && `Quantity: ${fields.quantity}`,
+      fields.timeline && `Timeline: ${fields.timeline}`,
+      fields.material && `Material: ${fields.material}`,
+      `Preferred contact: ${fields.contactMethod}`,
+      files.length
+        ? `Files to share separately: ${files.map((file) => file.name).join(", ")}`
+        : "Files: none",
+    ]
+      .filter(Boolean)
+      .join("\n");
 
-    files.forEach(file => {
-    formData.append('files', file);
-  });
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/919740443999?text=${encodedMessage}`;
+    const emailUrl = `mailto:dkfabs@gmail.com?subject=${encodeURIComponent(`Quote request from ${fields.name}`)}&body=${encodedMessage}`;
 
     try {
-      // ✅ REAL BACKEND CONNECTION
-      const response = await fetch('http://localhost:5000/api/quotes/quote', {
-        method: 'POST',
-        body: formData,  // Files automatically included
-      });
-
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        setStatus({ type: 'success', message: result.message || 'Quote request sent successfully! We\'ll contact you within 24 hours.' });
-        e.target.reset();
-        setFiles([]);
-        setShowOptional(false);
+      if (fields.contactMethod === "whatsapp") {
+        window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+      } else if (fields.contactMethod === "both") {
+        window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+        window.location.href = emailUrl;
       } else {
-        setStatus({ type: 'error', message: result.error || result.message || 'Failed to send request.' });
+        window.location.href = emailUrl;
       }
-    } catch (error) {
-      setStatus({ type: 'error', message: 'Network error. Please check your connection and try again.' });
+
+      setStatus({
+        type: "success",
+        message:
+          "Your message is ready. Complete the send step in your email or WhatsApp app.",
+      });
+      e.target.reset();
+      setFiles([]);
+      setShowOptional(false);
+    } catch {
+      setStatus({
+        type: "error",
+        message:
+          "Could not open your email or WhatsApp app. Please contact us directly.",
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <form className="contact-form" id="quoteForm" onSubmit={handleSubmit} encType="multipart/form-data">
+    <form
+      className="contact-form"
+      id="quoteForm"
+      onSubmit={handleSubmit}
+      encType="multipart/form-data"
+    >
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="name">Full Name *</label>
@@ -177,28 +226,35 @@ const QuoteForm = () => {
       </div>
 
       <div className="form-group">
-        <label htmlFor="description">Project Description & Requirements *</label>
+        <label htmlFor="description">
+          Project Description & Requirements *
+        </label>
         <div className="textarea-container">
-          <textarea 
-            id="description" 
-            name="description" 
-            rows="5" 
-            placeholder="Please describe your project requirements, dimensions, tolerances, and any specific details..." 
+          <textarea
+            id="description"
+            name="description"
+            rows="5"
+            placeholder="Please describe your project requirements, dimensions, tolerances, and any specific details..."
             required
           ></textarea>
-          <button type="button" className="file-attach-btn" onClick={() => document.getElementById('fileInput').click()} title="Attach Files">
+          <button
+            type="button"
+            className="file-attach-btn"
+            onClick={() => document.getElementById("fileInput").click()}
+            title="Attach Files"
+          >
             <i className="fas fa-paperclip"></i>
           </button>
         </div>
-        <input 
-          ref={fileInputRef}  // ← CHANGE 5: Add this ref
-          type="file" 
-          id="fileInput" 
-          name="files" 
-          multiple 
-          accept=".pdf,.png,.jpg,.jpeg,.dwg,.step,.stp,.iges,.igs,.stl,.dxf" 
-          style={{ display: 'none' }} 
-          onChange={handleFileChange} 
+        <input
+          ref={fileInputRef} // ← CHANGE 5: Add this ref
+          type="file"
+          id="fileInput"
+          name="files"
+          multiple
+          accept=".pdf,.png,.jpg,.jpeg,.dwg,.step,.stp,.iges,.igs,.stl,.dxf"
+          style={{ display: "none" }}
+          onChange={handleFileChange}
         />
       </div>
 
@@ -206,20 +262,37 @@ const QuoteForm = () => {
         {files.map((file, index) => (
           <div className="file-item" key={index}>
             <i className={getFileIcon(file.name)}></i>
-            <span className="file-name" title={file.name}>{file.name}</span>
+            <span className="file-name" title={file.name}>
+              {file.name}
+            </span>
             <span className="file-size">{formatFileSize(file.size)}</span>
-            <button type="button" className="remove-file" onClick={() => removeFile(index)}>×</button>
+            <button
+              type="button"
+              className="remove-file"
+              onClick={() => removeFile(index)}
+            >
+              ×
+            </button>
           </div>
         ))}
       </div>
 
       <div className="optional-details">
-        <button type="button" className={`expand-btn ${showOptional ? 'active' : ''}`} onClick={toggleOptionalDetails}>
-          <i className={`fas ${showOptional ? 'fa-minus' : 'fa-plus'}`}></i> 
-          {showOptional ? 'Hide Optional Details' : 'Fill More Details (Optional)'}
+        <button
+          type="button"
+          className={`expand-btn ${showOptional ? "active" : ""}`}
+          onClick={toggleOptionalDetails}
+        >
+          <i className={`fas ${showOptional ? "fa-minus" : "fa-plus"}`}></i>
+          {showOptional
+            ? "Hide Optional Details"
+            : "Fill More Details (Optional)"}
         </button>
 
-        <div className={`optional-content ${showOptional ? 'active' : ''}`} id="optionalContent">
+        <div
+          className={`optional-content ${showOptional ? "active" : ""}`}
+          id="optionalContent"
+        >
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="quantity">Estimated Quantity</label>
@@ -260,7 +333,12 @@ const QuoteForm = () => {
             </div>
             <div className="form-group">
               <label htmlFor="material">Material Specification</label>
-              <input type="text" id="material" name="material" placeholder="e.g., Stainless Steel 304, Aluminum 6061" />
+              <input
+                type="text"
+                id="material"
+                name="material"
+                placeholder="e.g., Stainless Steel 304, Aluminum 6061"
+              />
             </div>
           </div>
         </div>
@@ -270,7 +348,12 @@ const QuoteForm = () => {
         <label>Preferred Contact Method *</label>
         <div className="contact-method">
           <label className="radio-option">
-            <input type="radio" name="contactMethod" value="email" defaultChecked />
+            <input
+              type="radio"
+              name="contactMethod"
+              value="email"
+              defaultChecked
+            />
             <span className="radio-custom"></span>
             Email
           </label>
@@ -288,8 +371,10 @@ const QuoteForm = () => {
       </div>
 
       <button type="submit" className="submit-btn" disabled={isSubmitting}>
-        <i className={`fas ${isSubmitting ? 'fa-spinner fa-spin' : 'fa-paper-plane'}`}></i> 
-        {isSubmitting ? 'Sending...' : 'Send Quote Request'}
+        <i
+          className={`fas ${isSubmitting ? "fa-spinner fa-spin" : "fa-paper-plane"}`}
+        ></i>
+        {isSubmitting ? "Sending..." : "Send Quote Request"}
       </button>
 
       {status.message && (

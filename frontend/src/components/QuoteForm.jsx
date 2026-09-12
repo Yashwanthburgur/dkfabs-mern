@@ -143,67 +143,37 @@ const QuoteForm = () => {
     setIsSubmitting(true);
     setStatus({
       type: "loading",
-      message: "Opening your selected contact channel...",
+      message: "Sending your quote request...",
     });
 
     const formData = new FormData(e.target);
-    const fields = Object.fromEntries(formData.entries());
-    const message = [
-      `Quote request from ${fields.name}`,
-      `Email: ${fields.email}`,
-      `Phone: ${fields.phone}`,
-      fields.company && `Company: ${fields.company}`,
-      `Description: ${fields.description}`,
-      fields.service && `Service: ${fields.service}`,
-      fields.quantity && `Quantity: ${fields.quantity}`,
-      fields.timeline && `Timeline: ${fields.timeline}`,
-      fields.material && `Material: ${fields.material}`,
-      `Preferred contact: ${fields.contactMethod}`,
-      files.length
-        ? `Files selected: ${files.map((file) => file.name).join(", ")} (please attach them manually)`
-        : "Files: none",
-    ]
-      .filter(Boolean)
-      .join("\n");
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/919740443999?text=${encodedMessage}`;
-    const emailUrl = `mailto:dkfabs@gmail.com?subject=${encodeURIComponent(`Quote request from ${fields.name}`)}&body=${encodedMessage}`;
+    fetch(`${apiUrl}/api/quotes/quote`, {
+      method: "POST",
+      body: formData,
+    })
+      .then(async (response) => {
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+          throw new Error(result.error || "Quote request could not be sent.");
+        }
 
-    try {
-      const openWhatsApp = () =>
-        window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-      const openEmail = () =>
-        window.open(emailUrl, "_blank", "noopener,noreferrer");
-
-      if (fields.contactMethod === "whatsapp") {
-        openWhatsApp();
-      } else if (fields.contactMethod === "both") {
-        openWhatsApp();
-        window.setTimeout(openEmail, 250);
-      } else {
-        openEmail();
-      }
-
-      setStatus({
-        type: "success",
-        message:
-          fields.contactMethod === "both"
-            ? "WhatsApp and email are ready. Complete the send step in both apps."
-            : "Your message is ready. Complete the send step in the opened app.",
-      });
-      e.target.reset();
-      setFiles([]);
-      setShowOptional(false);
-    } catch {
-      setStatus({
-        type: "error",
-        message:
-          "Could not open your email or WhatsApp app. Please contact us directly.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+        setStatus({
+          type: "success",
+          message: result.message || "Quote request sent successfully.",
+        });
+        e.target.reset();
+        setFiles([]);
+        setShowOptional(false);
+      })
+      .catch((error) => {
+        setStatus({
+          type: "error",
+          message: error.message || "Could not send your quote request.",
+        });
+      })
+      .finally(() => setIsSubmitting(false));
   };
 
   return (

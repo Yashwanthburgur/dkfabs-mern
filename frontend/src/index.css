@@ -1057,7 +1057,7 @@ body {
 
 .project-card {
   position: relative;
-  height: auto;
+  height: 520px;
   border-radius: 20px;
   overflow: hidden;
   background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
@@ -1082,16 +1082,14 @@ body {
 .project-image {
   position: relative;
   width: 100%;
-  height: auto;
-  min-height: 380px;
+  height: 100%;
   overflow: hidden;
   background: #090909;
 }
 
 .project-image img {
   width: 100%;
-  height: auto;
-  max-height: 560px;
+  height: 100%;
   display: block;
   object-fit: contain;
   transition: transform 0.6s ease;
@@ -1101,12 +1099,14 @@ body {
   transform: scale(1.05);
 }
 
-.project-caption {
-  position: relative;
+.project-overlay {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
   color: white;
-  padding: 24px 28px 28px;
-  background: #151515;
-  border-top: 1px solid #333;
+  padding: 72px 28px 24px;
+  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.94) 42%);
 }
 
 .carousel-control {
@@ -1159,13 +1159,13 @@ body {
   transform: scale(1.25);
 }
 
-.project-caption h3 {
-  font-size: 1.8rem;
+.project-overlay h3 {
+  font-size: 1.6rem;
   margin-bottom: 12px;
   font-weight: 700;
 }
 
-.project-caption p {
+.project-overlay p {
   font-size: 1rem;
   line-height: 1.6;
   color: #ddd;
@@ -1231,12 +1231,12 @@ body {
     padding: 0 38px;
   }
 
-  .project-image {
-    min-height: 220px;
+  .project-card {
+    height: 390px;
   }
 
-  .project-caption {
-    padding: 20px;
+  .project-overlay {
+    padding: 60px 20px 20px;
   }
 }
 
@@ -1263,7 +1263,7 @@ body {
     flex-direction: column;
   }
 
-  .project-image {
-    min-height: 180px;
+  .project-card {
+    height: 340px;
   }
 }

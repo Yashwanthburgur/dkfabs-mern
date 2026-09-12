@@ -48,10 +48,10 @@ const ProjectsCarousel = () => {
               >
                 <div className="project-image">
                   <img src={project.image} alt={project.title} loading="lazy" />
-                </div>
-                <div className="project-caption">
-                  <h3>{project.title}</h3>
-                  <p>{project.desc}</p>
+                  <div className="project-overlay">
+                    <h3>{project.title}</h3>
+                    <p>{project.desc}</p>
+                  </div>
                 </div>
               </div>
             ))}

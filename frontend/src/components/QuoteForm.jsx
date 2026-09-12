@@ -138,10 +138,13 @@ const QuoteForm = () => {
     }, 5000);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setStatus({ type: "loading", message: "Sending your request..." });
+    setStatus({
+      type: "loading",
+      message: "Opening your selected contact channel...",
+    });
 
     const formData = new FormData(e.target);
     const fields = Object.fromEntries(formData.entries());
@@ -157,7 +160,7 @@ const QuoteForm = () => {
       fields.material && `Material: ${fields.material}`,
       `Preferred contact: ${fields.contactMethod}`,
       files.length
-        ? `Files to share separately: ${files.map((file) => file.name).join(", ")}`
+        ? `Files selected: ${files.map((file) => file.name).join(", ")} (please attach them manually)`
         : "Files: none",
     ]
       .filter(Boolean)
@@ -168,19 +171,26 @@ const QuoteForm = () => {
     const emailUrl = `mailto:dkfabs@gmail.com?subject=${encodeURIComponent(`Quote request from ${fields.name}`)}&body=${encodedMessage}`;
 
     try {
+      const openWhatsApp = () =>
+        window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+      const openEmail = () =>
+        window.open(emailUrl, "_blank", "noopener,noreferrer");
+
       if (fields.contactMethod === "whatsapp") {
-        window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+        openWhatsApp();
       } else if (fields.contactMethod === "both") {
-        window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-        window.location.href = emailUrl;
+        openWhatsApp();
+        window.setTimeout(openEmail, 250);
       } else {
-        window.location.href = emailUrl;
+        openEmail();
       }
 
       setStatus({
         type: "success",
         message:
-          "Your message is ready. Complete the send step in your email or WhatsApp app.",
+          fields.contactMethod === "both"
+            ? "WhatsApp and email are ready. Complete the send step in both apps."
+            : "Your message is ready. Complete the send step in the opened app.",
       });
       e.target.reset();
       setFiles([]);
